@@ -5,8 +5,8 @@
 #include "Arduino.h"
 #include "twilio.hpp"
 
-const char * SSID = "NOME DA REDE 2.4GHZ";
-const char * PASSWORD = "SENHA DA REDE 2.4GHZ";
+const char * SSID = "REPLACE_WITH_YOUR_SSID";
+const char * PASSWORD = "REPLACE_WITH_YOUR_PASSWORD";
 
 #define PWDN_GPIO_NUM     32
 #define RESET_GPIO_NUM    -1
@@ -49,25 +49,41 @@ const char index_html[] PROGMEM = R"rawliteral(
             border: 2px solid gray;
             border-radius: 5%;
         }
+        #fps{
+       
+            scale: 4.0;
+            position: absolute;
+            bottom: 25%;
+           
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <img id="stream">
+        <img id="stream"><br>
+        <input type="range" id="fps" min="50" max="200" onchange="MudarFPS()">
     </div>
     
     <script>
-        setInterval(function () {
+        var fps = 50;
+        var myInterval = setInterval(rodar, fps);
+        function rodar() {
             const reqCam = new XMLHttpRequest();
             reqCam.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     document.getElementById("stream").src = "data:image/jpeg;base64," + reqCam.responseText;
+                    
                 }
             }
             reqCam.open('GET', '/cam', true);
             reqCam.send();
-        }, 100); 
+        }
+         function MudarFPS() {
+                fps = document.getElementById("fps").value;
+                clearInterval(myInterval);
+                myInterval = setInterval(rodar, fps);
+          }
     </script>
 </body>
 </html>
